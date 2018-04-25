@@ -1,26 +1,34 @@
 package main
 
 import (
-	"os"
 	"net/http"
-	"io/ioutil"
-	"fmt"
+	"os"
 )
 
-func przeslijNaSerwerPlikow(serwerPlikowURL string, sciezkaDoPliku string) (err error) {
+func przeslijNaSerwerPlikow(serwerPlikowURL string, sciezkaDoPliku string, nazwaPliku string, nazwaUzytkownika string) (err error) {
 	file, err := os.Open(sciezkaDoPliku)
 	if err != nil {
 		return
 	}
 	defer file.Close()
 
-	res, err := http.Post(serwerPlikowURL, "binary/octet-stream", file)
+	contentDisposition := zrobContentDisposition(nazwaPliku, nazwaUzytkownika)
+	client := &http.Client{}
+	request, _ := http.NewRequest("POST", serwerPlikowURL, file)
+	request.Header.Set("Content-Type", "binary/octet-stream")
+	request.Header.Set("Content-Disposition", contentDisposition)
+	response, _ := client.Do(request)
+
 	if err != nil {
 		return
 	}
-	defer res.Body.Close()
-	message, err := ioutil.ReadAll(res.Body)
+	defer response.Body.Close()
+	return
+}
 
-	fmt.Println(message)
+func zrobContentDisposition(nazwaPliku string, nazwaUzytkownika string) (contentDisposition string) {
+	contentDisposition = "attachment; "
+	contentDisposition += "filename=" + nazwaPliku + "; "
+	contentDisposition += "username" + nazwaUzytkownika
 	return
 }
