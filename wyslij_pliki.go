@@ -3,15 +3,17 @@ package main
 import (
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
-func przeslijNaSerwerPlikow(serwerPlikowURL string, sciezkaDoPliku string, nazwaPliku string, nazwaUzytkownika string) (err error) {
+func przeslijNaSerwerPlikow(serwerPlikowURL string, sciezkaDoPliku string, nazwaUzytkownika string) (err error) {
 	file, err := os.Open(sciezkaDoPliku)
 	if err != nil {
 		return
 	}
 	defer file.Close()
 
+	nazwaPliku := filepath.Base(file.Name())
 	contentDisposition := zrobContentDisposition(nazwaPliku, nazwaUzytkownika)
 	client := &http.Client{}
 	request, _ := http.NewRequest("POST", serwerPlikowURL, file)
@@ -29,6 +31,6 @@ func przeslijNaSerwerPlikow(serwerPlikowURL string, sciezkaDoPliku string, nazwa
 func zrobContentDisposition(nazwaPliku string, nazwaUzytkownika string) (contentDisposition string) {
 	contentDisposition = "attachment; "
 	contentDisposition += "filename=" + nazwaPliku + "; "
-	contentDisposition += "username" + nazwaUzytkownika
+	contentDisposition += "username=" + nazwaUzytkownika
 	return
 }

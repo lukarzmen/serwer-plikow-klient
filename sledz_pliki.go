@@ -38,7 +38,7 @@ func (klient Klient) Sledz() {
 
 func (k Klient) odpowiedzNaZdarzenie(event fsnotify.Event) {
 	if event.Op&fsnotify.Create == fsnotify.Create {
-		go przeslijNaSerwerPlikow(k.SerwerPlikowURL, k.SciezkaDoFolderuUzytkownika+"/"+event.Name, event.Name, k.NazwaKlienta)
+		go przeslijNaSerwerPlikow(k.SerwerPlikowURL, event.Name, k.NazwaKlienta)
 		log.Println("Utworzony plik: ", event.Name)
 	} else if event.Op&fsnotify.Remove == fsnotify.Remove {
 		log.Println("Usunieto plik: ", event.Name)
